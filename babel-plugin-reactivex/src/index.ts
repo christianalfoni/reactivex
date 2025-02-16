@@ -13,8 +13,9 @@ export default function reactivePlugin(): PluginObj {
       ClassDeclaration(path) {
         const node = path.node;
         let hasReactiveDecorator = false;
+        let reactiveOptions: any = null; // store options if provided
 
-        // Remove @reactive() decorator
+        // Remove @reactive(...) decorator and extract its argument if it exists
         if (node.decorators && node.decorators.length) {
           node.decorators = node.decorators.filter((decorator) => {
             if (
@@ -22,6 +23,12 @@ export default function reactivePlugin(): PluginObj {
               t.isIdentifier(decorator.expression.callee, { name: "reactive" })
             ) {
               hasReactiveDecorator = true;
+              if (
+                decorator.expression.arguments &&
+                decorator.expression.arguments.length > 0
+              ) {
+                reactiveOptions = decorator.expression.arguments[0];
+              }
               return false;
             }
             return true;
@@ -32,6 +39,12 @@ export default function reactivePlugin(): PluginObj {
         }
 
         if (hasReactiveDecorator) {
+          // Determine call arguments for reactive(this, reactiveOptions?)
+          const callArgs = [t.thisExpression()];
+          if (reactiveOptions) {
+            callArgs.push(reactiveOptions);
+          }
+
           // Find existing constructor
           let constructorMethod = node.body.body.find(
             (method) => t.isClassMethod(method) && method.kind === "constructor"
@@ -42,20 +55,18 @@ export default function reactivePlugin(): PluginObj {
             const classMethod = constructorMethod as t.ClassMethod;
             classMethod.body.body.push(
               t.expressionStatement(
-                t.callExpression(t.identifier("reactive"), [t.thisExpression()])
+                t.callExpression(t.identifier("reactive"), callArgs)
               )
             );
           } else {
-            // Create new constructor with reactive(this) call
+            // Create new constructor with reactive(this, reactiveOptions?) call
             const constructor = t.classMethod(
               "constructor",
               t.identifier("constructor"),
               [],
               t.blockStatement([
                 t.expressionStatement(
-                  t.callExpression(t.identifier("reactive"), [
-                    t.thisExpression(),
-                  ])
+                  t.callExpression(t.identifier("reactive"), callArgs)
                 ),
               ])
             );

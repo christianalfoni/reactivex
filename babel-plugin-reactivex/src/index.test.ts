@@ -11,7 +11,7 @@ function runTransform(input: string) {
 }
 
 describe("transform", () => {
-  test("Does not transforms function without jsx", () => {
+  test("Transforms class reactive decorator", () => {
     expect(
       runTransform(`@reactive()
 class App {}`)
@@ -19,6 +19,21 @@ class App {}`)
   constructor() {
     reactive(this);
   }
+}`);
+  });
+  test("Transforms with options", () => {
+    expect(
+      runTransform(`@reactive({ count: false })
+class App {
+  count = 0
+}`)
+    ).toBe(`class App {
+  constructor() {
+    reactive(this, {
+      count: false
+    });
+  }
+  count = 0;
 }`);
   });
 });
