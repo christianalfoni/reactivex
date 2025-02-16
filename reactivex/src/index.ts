@@ -6,4 +6,5 @@ configure({
 });
 
 export const reactive = makeAutoObservable;
+
 export const observer = reactObserver;
