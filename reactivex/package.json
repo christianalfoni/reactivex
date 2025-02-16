@@ -1,0 +1,18 @@
+{
+  "name": "reactivex",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "babel-plugin-observing-components": "^0.1.3",
+    "mobx": "^6.13.6",
+    "mobx-react-lite": "^4.1.0",
+    "swc-plugin-observing-components": "^0.1.1"
+  }
+}
