@@ -1,5 +1,9 @@
 import observingComponentsPlugin from "babel-plugin-observing-components";
+import reactivePlugin from "babel-plugin-reactivex";
 
 export default function plugins() {
-  return [observingComponentsPlugin({ importPath: "reactivex" })];
+  return [
+    reactivePlugin(),
+    observingComponentsPlugin({ importPath: "reactivex" }),
+  ];
 }
